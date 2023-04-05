@@ -21,6 +21,9 @@ match.call.defaults <- function(...) {
 climater_dap = function(id, args, verbose, dryrun, print.arg = FALSE){
   args$id = id
   args$catalog = do.call(climater_filter, args[names(args) %in% formalArgs(climater_filter)])
+  if(class(args$AOI) != "SpatVector"){
+    args$AOI = vect(args$AOI)
+  }
   args$verbose = verbose
   if(print.arg){print(args)}
   
@@ -336,6 +339,9 @@ getLOCA_hydro = function(AOI, varname,
                          model = 'CCSM4', scenario = 'rcp45', 
                          startDate, endDate = NULL, 
                          verbose = FALSE, dryrun = FALSE){
+  if(class(AOI) != "SpatVector"){
+    AOI = vect(args$AOI)
+  }
   
   J <- year <- y <- URL <- layers <- nrows <- ncols <- n_values <- NULL
   
@@ -363,7 +369,7 @@ getLOCA_hydro = function(AOI, varname,
   if(dryrun){
     for(i in 1:nrow(dap)){
       r = rast(ext = make_ext(dap[i,]), crs = dap$crs[i], res = c(dap$resX[i], dap$resY[i])) %>% 
-        crop(project(vect(AOI), dap$crs[i]))
+        crop(project(AOI, dap$crs[i]))
       dap$URL[i]    = paste0('/vsicurl/', glue(dap$URL[i], year = dap$year[i]))
       dap$layers[i] = dap$lyr2[i] - dap$lyr1[i] + 1
       dap$nrows[i]  = nrow(r)

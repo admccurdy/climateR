@@ -166,13 +166,12 @@ vrt_crop_get = function(URL = NULL,
   }
   
   if (!is.null(AOI) & flag) {
-    AOIv =  vect(AOI)
     
     fin = tryCatch({
-      crop(fin, project(AOIv, crs(fin[[1]])))
+      crop(fin, project(AOI, crs(fin[[1]])))
     }, error = function(e) {
       lapply(1:length(fin), function(x) {
-        crop(fin[[x]], project(AOIv, crs(fin[[x]])))
+        crop(fin[[x]], project(AOI, crs(fin[[x]])))
       })
     })
   }
@@ -284,11 +283,10 @@ dap_crop <- function(URL = NULL,
     catalog$X <- paste0("[0:1:", catalog$ncols - 1, "]")
     catalog$Y <- paste0("[0:1:", catalog$nrows - 1, "]")
   } else {
-    AOIspat <- vect(AOI)
     
     out <- lapply(1:nrow(catalog), function(i) {
       tryCatch({
-        intersect(ext(project(AOIspat, catalog$crs[i])), make_ext(catalog[i,]))
+        intersect(ext(project(AOI, catalog$crs[i])), make_ext(catalog[i,]))
       },
       error = function(e) {
         NULL
@@ -557,6 +555,10 @@ dap_summary <- function(dap = NULL, url = NULL) {
 
 read_ftp = function(URL, cat, lyrs = 1, AOI, ext = NULL, crs = NULL, dates = NULL){
   
+  if(class(AOI) != "SpatVector"){
+    AOI = vect(AOI)
+  }
+  
   o = suppressWarnings(rast(URL , lyrs = lyrs))
   
   
@@ -568,13 +570,13 @@ read_ftp = function(URL, cat, lyrs = 1, AOI, ext = NULL, crs = NULL, dates = NUL
     ext(o) = ext
   }
   
-  e =  align(ext(project(vect(AOI), crs(o))), o)
+  e =  align(ext(project(AOI, crs(o))), o)
   
   if(cat$toptobottom){
     z = crop(o, e)
   } else {
     
-    e =  align(ext(project(vect(AOI), crs(o))), o)
+    e =  align(ext(project(AOI, crs(o))), o)
     
     ymax <- ymax(o) - (e$ymin - ymin(o))
     ymin <- ymax(o) - (e$ymax - ymin(o))
