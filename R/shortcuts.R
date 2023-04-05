@@ -21,8 +21,8 @@ match.call.defaults <- function(...) {
 climater_dap = function(id, args, verbose, dryrun, print.arg = FALSE){
   args$id = id
   args$catalog = do.call(climater_filter, args[names(args) %in% formalArgs(climater_filter)])
-  if(class(args$AOI) != "SpatVector"){
-    args$AOI = vect(args$AOI)
+  if(class(eval(args$AOI)) != "SpatVector"){
+    assign(as.character(args$AOI), vect(eval(args$AOI)))
   }
   args$verbose = verbose
   if(print.arg){print(args)}
