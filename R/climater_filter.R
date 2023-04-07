@@ -146,7 +146,6 @@ climater_filter <- function(id = NULL,
         
       })
     })
-    
     catalog = catalog[gid, ]
     
     if(nrow(catalog) == 0){
